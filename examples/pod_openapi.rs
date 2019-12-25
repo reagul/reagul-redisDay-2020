@@ -17,8 +17,7 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let config = config::load_kube_config().await?;
     let client = APIClient::new(config);
-    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
-    let mut con = client.get_connection()?;
+
     // Manage pods
     let pods = Api::v1Pod(client).within("default");
 
@@ -64,6 +63,8 @@ async fn main() -> anyhow::Result<()> {
             "activeDeadlineSeconds": 5
         }
     });
+    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
+    let mut con = client.get_connection()?;
     let patch_params = PatchParams::default();
     let p_patched = pods
         .patch("blog", &patch_params, serde_json::to_vec(&patch)?)
