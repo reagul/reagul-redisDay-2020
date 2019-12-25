@@ -55,7 +55,7 @@ async fn main() -> anyhow::Result<()> {
     assert_eq!(p1cpy.spec.containers[0].name, "blog");
 
     let _ : () = redis::cmd("LPUSH").arg("PODLIST").arg(p1cpy.metadata.name).query(&mut con)?;
-    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg(p1cpy.metadata.name).query(&mut con)?;
+
     // Replace its spec
     info!("Patch Pod blog");
     let patch = json!({
@@ -72,7 +72,7 @@ async fn main() -> anyhow::Result<()> {
         .patch("blog", &patch_params, serde_json::to_vec(&patch)?)
         .await?;
     assert_eq!(p_patched.spec.active_deadline_seconds, Some(5));
-
+    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg(p_patched.metadata.name).query(&mut con)?;
     for p in pods.list(&ListParams::default()).await? {
         println!("Got Pod: {}", p.metadata.name);
 
