@@ -3,7 +3,7 @@ extern crate log;
 extern crate redis;
 
 use serde_json::json;
-use redis::Commands;
+//use redis::Commands;
 
 use kube::{
     api::{Api, DeleteParams, ListParams, PatchParams, PostParams},
@@ -17,6 +17,8 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let config = config::load_kube_config().await?;
     let client = APIClient::new(config);
+    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
+    let mut con = client.get_connection()?;
 
     // Manage pods
     let pods = Api::v1Pod(client).within("default");
@@ -70,6 +72,7 @@ async fn main() -> anyhow::Result<()> {
     assert_eq!(p_patched.spec.active_deadline_seconds, Some(5));
 
     for p in pods.list(&ListParams::default()).await? {
+        let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg(p.metadata.name).query(&mut con)?;
         println!("Got Pod: {}", p.metadata.name);
     }
 
@@ -80,10 +83,9 @@ async fn main() -> anyhow::Result<()> {
         info!("Deleting blog pod started");
     });
 
-    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
-    let mut con = client.get_connection()?;
-    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg("ravipod23").query(&mut con)?;
-    let _ : () = redis::cmd("SET").arg("my_key").arg(3000242).query(&mut con)?;
+
+    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg("thor").query(&mut con)?;
+    let _ : () = redis::cmd("LPUSH").arg("PODLIST").arg(3000242).query(&mut con)?;
 
     Ok(())
 }
