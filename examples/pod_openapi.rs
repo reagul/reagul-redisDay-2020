@@ -53,6 +53,8 @@ async fn main() -> anyhow::Result<()> {
     println!("Got blog pod with containers: {:?}", p1cpy.spec.containers);
     assert_eq!(p1cpy.spec.containers[0].name, "blog");
 
+    let _ : () = redis::cmd("LPUSH").arg("PODLIST").arg(p1cpy.metadata.name).query(&mut con)?;
+    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg(p1cpy.metadata.name).query(&mut con)?;
     // Replace its spec
     info!("Patch Pod blog");
     let patch = json!({
@@ -74,9 +76,10 @@ async fn main() -> anyhow::Result<()> {
     for p in pods.list(&ListParams::default()).await? {
         println!("Got Pod: {}", p.metadata.name);
 
-        let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg(p.metadata.name).query(&mut con)?;
-        let _ : () = redis::cmd("LPUSH").arg("PODLIST").arg(p.metadata.name).query(&mut con)?;
+
+
     }
+
 
     // Delete it
     let dp = DeleteParams::default();
