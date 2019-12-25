@@ -46,7 +46,8 @@ async fn main() -> anyhow::Result<()> {
         Err(kube::Error::Api(ae)) => assert_eq!(ae.code, 409), // if you skipped delete, for instance
         Err(e) => return Err(e.into()),                        // any other case is probably bad
     }
-
+    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
+    let mut con = client.get_connection()?;
     // Verify we can get it
     info!("Get Pod blog");
     let p1cpy = pods.get("blog").await?;
@@ -65,8 +66,7 @@ async fn main() -> anyhow::Result<()> {
             "activeDeadlineSeconds": 5
         }
     });
-    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
-    let mut con = client.get_connection()?;
+
     let patch_params = PatchParams::default();
     let p_patched = pods
         .patch("blog", &patch_params, serde_json::to_vec(&patch)?)
