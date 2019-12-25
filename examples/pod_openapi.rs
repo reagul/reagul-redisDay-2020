@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate log;
+extern crate redis;
+
 use serde_json::json;
+use redis::Commands;
 
 use kube::{
     api::{Api, DeleteParams, ListParams, PatchParams, PostParams},
@@ -76,6 +79,11 @@ async fn main() -> anyhow::Result<()> {
         assert_eq!(pdel.metadata.name, "blog");
         info!("Deleting blog pod started");
     });
+
+    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
+    let mut con = client.get_connection()?;
+    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg("ravipod23").query(&mut con)?;
+    let _ : () = redis::cmd("SET").arg("my_key").arg(3000242).query(&mut con)?;
 
     Ok(())
 }
