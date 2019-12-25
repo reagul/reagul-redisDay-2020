@@ -3,7 +3,7 @@ extern crate log;
 extern crate redis;
 
 use serde_json::json;
-//use redis::Commands;
+use redis::Commands;
 
 use kube::{
     api::{Api, DeleteParams, ListParams, PatchParams, PostParams},
