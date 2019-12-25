@@ -17,7 +17,8 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let config = config::load_kube_config().await?;
     let client = APIClient::new(config);
-
+    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
+    let mut con = client.get_connection()?;
     // Manage pods
     let pods = Api::v1Pod(client).within("default");
 
@@ -71,6 +72,9 @@ async fn main() -> anyhow::Result<()> {
 
     for p in pods.list(&ListParams::default()).await? {
         println!("Got Pod: {}", p.metadata.name);
+
+        let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg(p.metadata.name).query(&mut con)?;
+        let _ : () = redis::cmd("LPUSH").arg("PODLIST").arg(p.metadata.name).query(&mut con)?;
     }
 
     // Delete it
@@ -80,10 +84,8 @@ async fn main() -> anyhow::Result<()> {
         info!("Deleting blog pod started");
     });
 
-    let client = redis::Client::open("redis://127.0.0.1/").unwrap();
-    let mut con = client.get_connection()?;
-    let _ : () = redis::cmd("PUBLISH").arg("podclannel").arg("ravipod23").query(&mut con)?;
-    let _ : () = redis::cmd("SET").arg("my_key").arg(3000242).query(&mut con)?;
+
+    let _ : () = redis::cmd("SET").arg("my_key").arg("thor").query(&mut con)?;
 
     Ok(())
 }
