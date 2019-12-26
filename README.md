@@ -1,4 +1,4 @@
-# Redis Day 
+# Redis Day Seattle Jan 2020
 Rust / Redis PubSub / K8  API
 
 
