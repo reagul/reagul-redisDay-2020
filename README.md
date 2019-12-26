@@ -1,12 +1,8 @@
-# Redia Day Rust / Redis PubSiub / K8  API
+# Redis Day 
+Rust / Redis PubSub / K8  API
 
 
-Rust client for [Kubernetes](http://kubernetes.io) in the style of a more generic [client-go](https://github.com/kubernetes/client-go). It makes certain assumptions about the kubernetes api to allow writing generic abstractions, and as such contains rust reinterpretations of `Reflector` and `Informer` to allow writing kubernetes controllers/watchers/operators easily.
-
-You can operate entirely without openapi definitions if you are operating on a `CustomResource`, but if you require the full definitions of native objects, it is easier to compile with the `openapi` feature to get accurate struct representations via [k8s-openapi](https://github.com/Arnavion/k8s-openapi).
-
-NB: This library is currently undergoing a lot of changes with async/await stabilizing. Please check the [CHANGELOG](./CHANGELOG.md) when upgrading.
-
+Sample RUST / Redis code that will watch over Pods in the default cluster and write to PubSub when a condition 's occur.
 ## Installation
 To use the openapi generated types:
 

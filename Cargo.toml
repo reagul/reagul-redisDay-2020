@@ -2,12 +2,9 @@
 name = "kube"
 version = "0.22.2"
 description = "Kubernetes client in the style of client-go"
-authors = [
-  "clux <sszynrae@gmail.com>",
-  "ynqa <un.pensiero.vano@gmail.com>",
-]
+authors = ["ravijag@gmail.com"]
 license-file = "LICENSE"
-repository = "https://github.com/clux/kube-rs"
+repository = "https://github.com/reagul/reagul-redisDay-2020"
 readme = "README.md"
 keywords = ["kubernetes", "reflector", "informer", "client-go", "client-rust"]
 categories = ["web-programming::http-client"]
